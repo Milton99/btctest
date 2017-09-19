@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import hashlib
 import hmac
 import random
@@ -227,7 +229,7 @@ class Dealer(object):
 		self._url = self._get_request_url('balance')
 		self._get_basic_payload()
 		self._post_signatured_payload()
-		resp = self.resp.json()
+		resp = self.resp.json() 
 		if self._speed_issue(resp):
 			time.sleep(2)
 			return self.get_balance()
@@ -420,21 +422,69 @@ class Dealer(object):
 		return url
 
 #-------------------------------------------------------------------------------------------
-if __name__=='__main__':
-
+def main():
 	# 查询当前行情
-	# m = MarketCondition(market = "btctrade", coin = "btc", logging = True)
-	# print m.get_ticker()
+	m_btc = MarketCondition(market = "btctrade", coin = "btc", logging = False).get_ticker()
+	m_eth = MarketCondition(market = "btctrade", coin = "eth", logging = False).get_ticker()
+	m_ltc = MarketCondition(market = "btctrade", coin = "ltc", logging = False).get_ticker()
+	m_doge = MarketCondition(market = "btctrade", coin = "doge", logging = False).get_ticker()
+	m_ybc = MarketCondition(market = "btctrade", coin = "ybc", logging = False).get_ticker()
 
 	# 查询账户资产信息
-	# d = Dealer(market = "btctrade", coin = "btc",  logging = True)
-	# print d.get_balance()
+	dealer_balance = Dealer(market = "btctrade", coin = "btc",  logging = False).get_balance()
+	dealer_balance = {key: float(value) for (key,value) in dealer_balance.items()} 
+
+	#折算人民币价值
+	cny_balance={}
+	cny_balance['cny'] = (dealer_balance['cny_balance'] + dealer_balance['cny_reserved']) 
+	cny_balance['btc'] = (dealer_balance['btc_balance'] + dealer_balance['btc_reserved']) * m_btc['last']
+	cny_balance['eth'] = (dealer_balance['eth_balance'] + dealer_balance['eth_reserved']) * m_eth['last']
+	cny_balance['ltc'] = (dealer_balance['ltc_balance'] + dealer_balance['ltc_reserved']) * m_ltc['last']
+	cny_balance['doge'] = (dealer_balance['doge_balance'] + dealer_balance['doge_reserved']) * m_doge['last']
+	cny_balance['ybc'] = (dealer_balance['ybc_balance'] + dealer_balance['ybc_reserved']) * m_ybc['last']
+	value_total = sum(cny_balance.values())
+
+	for k,v in cny_balance.items():
+		print "the rmb value of " + k + " is： %f" %v
+
+	print "财产折合人民币：%.2f" %value_total
+	print "财产折合比特币: %f" %(value_total/m_btc['last'])
+	rate=6.87
+	print "比特币现行价: %.2f" %m_btc['last'] + " 元 or " + ("%.2f" %(m_btc['last']/rate)) + " 美金"
+	
+
 
 	# 查询特定挂单信息，需要提供挂单ID
 	# d = Dealer(market = "btctrade", coin = "btc",  logging = True)
 	# print d.fetch_order()
 
 	# 查询挂单信息
-	d = Dealer(market = "btctrade", coin = "btc",  logging = True)
-	print d.get_orders('all')
+	# d = Dealer(market = "btctrade", coin = "btc",  logging = True)
+	# print d.get_orders('all')
+
+
+#code_to_profile()
+if __name__=='__main__':
+
+	#import related libraries
+	from pycallgraph import PyCallGraph
+	from pycallgraph.output import GraphvizOutput
+	from pycallgraph import Config, GlobbingFilter
+
+	#config here, check definitions to find more options
+	config = Config(max_depth=10)
+	graphviz = GraphvizOutput(output_type='svg', output_file='filter_max_depth.svg')
+	#graphviz = GraphvizOutput(output_type='png', output_file='filter_max_depth.png')
+	config.trace_filter = GlobbingFilter(exclude=[
+		'abc.*',
+		'okk'
+	])
+
+	#do profiling and intercall relationship graphing
+	with PyCallGraph(output=graphviz, config=config):
+
+		# run main program
+		main()
+
+
 

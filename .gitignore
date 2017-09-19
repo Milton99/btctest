@@ -1,2 +1,8 @@
 *.pyc
 build/
+test.py 
+*.svg
+*.png
+*.jpg
+
+

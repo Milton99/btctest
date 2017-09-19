@@ -1,6 +1,6 @@
 // Place your settings in this file to overwrite default and user settings.
 {
-    "python.pythonPath": "C:\\Program Files (x86)\\Anaconda2\\python.exe",
+    "python.pythonPath": "E:/pyevs/py36/Script/Python.exe",
     "editor.renderWhitespace": "all",
     "files.autoSave": "afterDelay",
     "files.exclude": {
@@ -8,9 +8,6 @@
         "**/*.pyc": true,
         "**/.vscode": false,
         "**/.DS_Store": true
-    }
-,
-"python.formatting.provider": "yapf",
-"editor.wrappingColumn": 400,
+    },
 "terminal.integrated.shell.windows": "D:\\portableEXEs\\Git\\bin\\bash.exe"
 }
